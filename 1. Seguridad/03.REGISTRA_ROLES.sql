@@ -36,5 +36,18 @@ IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='AGUSE01')
 	ELSE
 		RAISE NOTICE 'Ya estaba registrado el rol AGUSE01';
 	END IF; 
+IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='GUSEWS01')
+	THEN 
+		INSERT INTO seguridad.mae_rol(
+			n_rol,c_rol,x_rol,x_descripcion,l_activo,
+			f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
+		VALUES(
+			nextval('seguridad.mae_rol_seq'),'GUSEWS01','Rol que permite consultar metodos necesarios para el servicio RENIEC',
+			'Rol que se otorga a usuarios que requieran obtener la lista de clientes con cuota ', '1',
+			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
+ 		 RAISE NOTICE 'Se creo el rol GUSEWS01';
+	ELSE
+		RAISE NOTICE 'Ya estaba registrado el rol GUSEWS01';
+	END IF; 
 COMMIT;
 END $$;
