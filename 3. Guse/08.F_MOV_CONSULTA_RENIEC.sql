@@ -13,16 +13,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_tipo_documento()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
-    END IF;
 
-            
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
+    END IF;
+   
         INSERT INTO serviciosexternos.aud_mae_tipo_documento(
             n_trns_id,
             --trazabilidad
@@ -50,7 +52,7 @@ BEGIN
         VALUES (
             nextval('serviciosexternos.useq_aud_mae_tipo_documento'), 
             --TRAZABILIDAD
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             session_user,
             OLD.c_aud_pc,
@@ -71,7 +73,6 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );     
-        
         RETURN OLD;
 END;
 $function$;
@@ -80,16 +81,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_persona()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+    
         INSERT INTO serviciosexternos.aud_mae_persona(
             n_trns_id,
             --trazabilidad
@@ -122,7 +125,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_persona'), 
             --trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             session_user,
             OLD.c_aud_pc,
@@ -149,7 +152,6 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
 END;
 $function$;
@@ -158,14 +160,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
-BEGIN 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+DECLARE 
+    operation CHAR(1);
+BEGIN
+
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
+    
         INSERT INTO serviciosexternos.aud_mae_usuario(
             n_trns_id,
             --trazabilidad
@@ -195,7 +201,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_usuario'), 
             --trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             session_user,
             OLD.c_aud_pc,
@@ -219,7 +225,6 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
 END;
 $function$;
@@ -228,16 +233,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_opcion()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+    
         INSERT INTO serviciosexternos.aud_mae_opcion(
             n_trns_id,
             --trazabilidad
@@ -264,7 +271,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_opcion'), 
             --trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             session_user,
             OLD.c_aud_pc,
@@ -285,7 +292,6 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
 END;
 $function$;
@@ -294,14 +300,16 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_perfil()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
 
         INSERT INTO serviciosexternos.aud_mae_perfil(
@@ -331,7 +339,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_perfil'), 
             --trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             session_user,
             OLD.c_aud_pc,
@@ -353,8 +361,8 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
+    
 END;
 $function$;
 
@@ -362,16 +370,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_opcion_perfil()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+    
 		INSERT INTO serviciosexternos.aud_mae_opcion_perfil(
 			n_trns_id,
 			--trazabilidad
@@ -399,7 +409,7 @@ BEGIN
 		) VALUES (
 			nextval('serviciosexternos.useq_aud_mae_opcion_perfil'), 
 			--trazabilidad
-			localtimestamp,
+			CURRENT_TIMESTAMP,
 			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
@@ -420,8 +430,8 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		
-        RETURN OLD;
+		RETURN OLD;
+
 END;
 $function$;
 
@@ -430,16 +440,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_entidad()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+   
         INSERT INTO serviciosexternos.aud_mae_entidad(
             n_trns_id,
             -- trazabilidad
@@ -452,7 +464,7 @@ BEGIN
             -- negocio
             n_entidad,
             x_entidad,
-            x_documento,
+            x_descripcion,
             l_activo,
             f_registro,
             -- control
@@ -466,7 +478,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_entidad'),
             -- trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             CURRENT_USER,
             OLD.c_aud_pc,
@@ -475,7 +487,7 @@ BEGIN
             -- negocio
             OLD.n_entidad,
             OLD.x_entidad,
-            OLD.x_documento,
+            OLD.x_descripcion,
             OLD.l_activo,
             OLD.f_registro,
             -- control
@@ -487,8 +499,8 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
+
 END;
 $function$;
 
@@ -496,14 +508,16 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_servicio()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
 
 		INSERT INTO serviciosexternos.aud_mae_servicio(
@@ -521,6 +535,7 @@ BEGIN
 			x_nombre_servicio,
 			x_descripcion,
 			x_url,
+			n_cuota,
 			l_actualizar_credencial,
 			n_dias_actualizar_credencial,
 			l_activo,
@@ -537,7 +552,7 @@ BEGIN
 		)VALUES(
 			nextval('serviciosexternos.useq_aud_mae_servicio'), 
 			--trazabilidad
-			localtimestamp,
+			CURRENT_TIMESTAMP,
 			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
@@ -549,6 +564,7 @@ BEGIN
 			OLD.x_nombre_servicio,
 			OLD.x_descripcion,
 			OLD.x_url,
+			OLD.n_cuota,
 			OLD.l_actualizar_credencial,
 			OLD.n_dias_actualizar_credencial,
 			OLD.l_activo,
@@ -562,8 +578,8 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		
-        RETURN OLD;
+		RETURN OLD;
+	
 END;
 $function$;
 
@@ -571,16 +587,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_servicio_aplicativo()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+   
 		INSERT INTO serviciosexternos.aud_mae_servicio_aplicativo(
 			n_trns_id,
 			--trazabilidad
@@ -608,7 +626,7 @@ BEGIN
 		)VALUES(
 			nextval('serviciosexternos.useq_aud_mae_servicio_aplicativo'), 
 			--trazabilidad
-			localtimestamp,
+			CURRENT_TIMESTAMP,
 			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
@@ -629,8 +647,8 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		
-        RETURN OLD;
+		RETURN OLD;
+	
 END;
 $function$;
 
@@ -638,16 +656,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_aplicativo()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+    
         INSERT INTO serviciosexternos.aud_mae_aplicativo(
             n_trns_id,
             -- trazabilidad
@@ -659,7 +679,6 @@ BEGIN
             c_trns_mcaddr,
             -- negocio
             n_aplicativo,
-            c_aplicativo,
             x_aplicativo,
             x_descripcion,
             l_activo,
@@ -675,7 +694,7 @@ BEGIN
         ) VALUES (
             nextval('serviciosexternos.useq_aud_mae_aplicativo'),
             -- trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             CURRENT_USER,
             OLD.c_aud_pc,
@@ -683,7 +702,6 @@ BEGIN
 			OLD.c_aud_mcaddr,
             -- negocio
             OLD.n_aplicativo,
-            OLD.c_aplicativo,
             OLD.x_aplicativo,
             OLD.x_descripcion,
             OLD.l_activo,
@@ -697,8 +715,8 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
-        
         RETURN OLD;
+
 END;
 $function$;
 
@@ -707,16 +725,18 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_cliente()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
+    
 		INSERT INTO serviciosexternos.aud_mae_cliente(
 			n_trns_id,
 			--trazabilidad
@@ -730,13 +750,14 @@ BEGIN
 			n_cliente,
 			n_persona,
 			n_aplicativo,
-			n_consumo_cuota,
 			x_usuario,
 			x_clave,
 			n_cuota,
 			x_usuario_registra,
-			x_usuario_actualiza,
+			x_usurio_actualiza,
 			f_actualizacion,
+			f_actualizacion_fallida,
+			l_principal,
 			l_activo,
 			f_registro,
 			--control
@@ -751,7 +772,7 @@ BEGIN
 		)VALUES(
 			nextval('serviciosexternos.useq_aud_mae_cliente'), 
 			--trazabilidad
-			localtimestamp,
+			CURRENT_TIMESTAMP,
 			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
@@ -761,13 +782,14 @@ BEGIN
 			OLD.n_cliente,
 			OLD.n_persona,
 			OLD.n_aplicativo,
-			OLD.n_consumo_cuota,
 			OLD.x_usuario,
 			OLD.x_clave,
 			OLD.n_cuota,
 			OLD.x_usuario_registra,
 			OLD.x_usuario_actualiza,
 			OLD.f_actualizacion,
+			OLD.f_actualizacion_fallida,
+			OLD.l_principal,
 			OLD.l_activo,
 			OLD.f_registro,
 			--control
@@ -779,8 +801,8 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		
-        RETURN OLD;
+		RETURN OLD;
+
 END;
 $function$;
 
@@ -789,53 +811,54 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mov_consumo_cuota()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
-DECLARE
-    operation CHAR;
+DECLARE 
+    operation CHAR(1);
 BEGIN
 
-    IF (TG_OP = 'DELETE') THEN 
-        operation := 'D';
-    ELSEIF (TG_OP = 'UPDATE') THEN 
-        operation := 'U';
+    IF (TG_OP = 'DELETE') THEN
+        operation :=operation;
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
     END IF;
-
-    INSERT INTO
-    serviciosexternos.aud_mov_consumo_cuota(
-        n_trns_id,
-        -- trazabilidad
-        f_trns,
-        b_trns,
-        c_trns_uid,
-        c_trns_pc,
-        n_trns_ip,
-        c_trns_mcaddr,
-        -- negocio
-        n_consumo_cuota,
-        f_consumo_cuota,
-        n_cuota_consumida,
-        l_activo,
-        f_registro,
-        -- control
-        f_aud,
-        b_aud,
-        c_aud_uid,
-        c_aud_uidred,
-        c_aud_pc,
-        c_aud_ip,
-        c_aud_mcaddr
-    )
-    VALUES
-        (
+   
+        INSERT INTO serviciosexternos.aud_mov_consumo_cuota(
+            n_trns_id,
+            -- trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            -- negocio
+            n_consumo_cuota,
+            n_cliente,
+            f_consumo_cuota,
+            n_cuota_consumida,
+            l_activo,
+            f_registro,
+            -- control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
             nextval('serviciosexternos.useq_aud_mov_consumo_cuota'),
             -- trazabilidad
-            localtimestamp,
+            CURRENT_TIMESTAMP,
             operation,
             CURRENT_USER,
             OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
+			OLD.c_aud_ip,
+			OLD.c_aud_mcaddr,
             -- negocio
             OLD.n_consumo_cuota,
+            OLD.n_cliente,
             OLD.f_consumo_cuota,
             OLD.n_cuota_consumida,
             OLD.l_activo,
@@ -849,7 +872,7 @@ BEGIN
             OLD.c_aud_ip,
             OLD.c_aud_mcaddr
         );
+        RETURN OLD;
 
-    RETURN OLD;
 END;
 $function$;

@@ -13,110 +13,82 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_tipo_documento()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
-    IF (TG_OP = 'DELETE') THEN        
-        INSERT INTO serviciosexternos.aud_mae_tipo_documento(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            b_tipo_documento,
-            x_tipo_documento,
-            x_abreviatura,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        )
-        VALUES (
-            nextval('serviciosexternos.useq_aud_mae_tipo_documento'), 
-            --TRAZABILIDAD
-            CURRENT_TIMESTAMP,
-            'D',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.b_tipo_documento,
-            OLD.x_tipo_documento,
-            OLD.x_abreviatura,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );     
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_tipo_documento(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            b_tipo_documento,
-            x_tipo_documento,
-            x_abreviatura,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        )
-        VALUES (
-            nextval('serviciosexternos.useq_aud_mae_tipo_documento'), 
-            --TRAZABILIDAD
-            CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.b_tipo_documento,
-            OLD.x_tipo_documento,
-            OLD.x_abreviatura,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );  
-        RETURN OLD;
-    ELSE
+    IF current_setting('gusemtd.trigger_control', true) = 'on' THEN   
         RETURN NULL;
     END IF;
+    
+    PERFORM set_config('gusemtd.trigger_control', 'on', true);
+    
+    IF (TG_OP = 'DELETE') THEN
+        operation :='D';
+        
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+        
+    END IF;
+
+        INSERT INTO serviciosexternos.aud_mae_tipo_documento(
+            n_trns_id,
+            --trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            --negocio
+            b_tipo_documento,
+            x_tipo_documento,
+            x_abreviatura,
+            l_activo,
+            f_registro,
+            --control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        )
+        VALUES (
+            nextval('serviciosexternos.useq_aud_mae_tipo_documento'), 
+            --TRAZABILIDAD
+            CURRENT_TIMESTAMP,
+            operation,
+            session_user,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr,
+            --negocio
+            OLD.b_tipo_documento,
+            OLD.x_tipo_documento,
+            OLD.x_abreviatura,
+            OLD.l_activo,
+            OLD.f_registro,
+            --control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );   
+
+        IF  (TG_OP = 'UPDATE') THEN
+            
+            UPDATE serviciosexternos.mae_tipo_documento
+            SET f_aud = CURRENT_TIMESTAMP,
+                b_aud = operation,
+                c_aud_uid = session_user
+            WHERE b_tipo_documento = NEW.b_tipo_documento;
+        END IF;
+        PERFORM set_config('gusemtd.trigger_control', 'off', true);
+        RETURN OLD;
 END;
 $function$;
 
@@ -124,132 +96,85 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_persona()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemp.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemp.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_persona(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_persona,
-            b_tipo_documento,
-            x_nombres,
-            x_primer_apellido,
-            x_segundo_apellido,
-            f_nacimiento,
-            x_documento_identidad,
-            x_direccion,
-            x_email,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_persona'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_persona,
-            OLD.b_tipo_documento,
-            OLD.x_nombres,
-            OLD.x_primer_apellido,
-            OLD.x_segundo_apellido,
-            OLD.f_nacimiento,
-            OLD.x_documento_identidad,
-            OLD.x_direccion,
-            OLD.x_email,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_persona(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_persona,
-            b_tipo_documento,
-            x_nombres,
-            x_primer_apellido,
-            x_segundo_apellido,
-            f_nacimiento,
-            x_documento_identidad,
-            x_direccion,
-            x_email,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_persona'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_persona,
-            OLD.b_tipo_documento,
-            OLD.x_nombres,
-            OLD.x_primer_apellido,
-            OLD.x_segundo_apellido,
-            OLD.f_nacimiento,
-            OLD.x_documento_identidad,
-            OLD.x_direccion,
-            OLD.x_email,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+    
+        INSERT INTO serviciosexternos.aud_mae_persona(
+            n_trns_id,
+            --trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            --negocio
+            n_persona,
+            b_tipo_documento,
+            x_nombres,
+            x_primer_apellido,
+            x_segundo_apellido,
+            f_nacimiento,
+            x_documento_identidad,
+            x_direccion,
+            x_email,
+            l_activo,
+            f_registro,
+            --control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_persona'), 
+            --trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            session_user,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr,
+            --negocio
+            OLD.n_persona,
+            OLD.b_tipo_documento,
+            OLD.x_nombres,
+            OLD.x_primer_apellido,
+            OLD.x_segundo_apellido,
+            OLD.f_nacimiento,
+            OLD.x_documento_identidad,
+            OLD.x_direccion,
+            OLD.x_email,
+            OLD.l_activo,
+            OLD.f_registro,
+            --control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusemp.trigger_control', 'off', true);
+        RETURN OLD;
 END;
 $function$;
 
@@ -257,120 +182,79 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_usuario()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemu.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemu.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_usuario(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_usuario,
-            n_persona,
-            n_perfil,
-            x_usuario,
-            x_password,
-            f_cambio_clave,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_usuario'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_usuario,
-            OLD.n_persona,
-            OLD.n_perfil,
-            OLD.x_usuario,
-            OLD.x_password,
-            OLD.f_cambio_clave,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_usuario(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_usuario,
-            n_persona,
-            n_perfil,
-            x_usuario,
-            x_password,
-            f_cambio_clave,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_usuario'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_usuario,
-            OLD.n_persona,
-            OLD.n_perfil,
-            OLD.x_usuario,
-            OLD.x_password,
-            OLD.f_cambio_clave,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+    
+        INSERT INTO serviciosexternos.aud_mae_usuario(
+            n_trns_id,
+            --trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            --negocio
+            n_usuario,
+            n_persona,
+            n_perfil,
+            x_usuario,
+            x_password,
+            f_cambio_clave,
+            l_activo,
+            f_registro,
+            --control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_usuario'), 
+            --trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            session_user,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr,
+            --negocio
+            OLD.n_usuario,
+            OLD.n_persona,
+            OLD.n_perfil,
+            OLD.x_usuario,
+            OLD.x_password,
+            OLD.f_cambio_clave,
+            OLD.l_activo,
+            OLD.f_registro,
+            --control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusemu.trigger_control', 'off', true);
+        RETURN OLD;
 END;
 $function$;
 
@@ -378,108 +262,73 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_opcion()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemo.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemo.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_opcion(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_opcion,
-            x_opcion,
-            x_endpoint,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_opcion'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_opcion,
-            OLD.x_opcion,
-            OLD.x_endpoint,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_opcion(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_opcion,
-            x_opcion,
-            x_endpoint,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_opcion'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_opcion,
-            OLD.x_opcion,
-            OLD.x_endpoint,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+    
+        INSERT INTO serviciosexternos.aud_mae_opcion(
+            n_trns_id,
+            --trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            --negocio
+            n_opcion,
+            x_opcion,
+            x_endpoint,
+            l_activo,
+            f_registro,
+            --control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_opcion'), 
+            --trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            session_user,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr,
+            --negocio
+            OLD.n_opcion,
+            OLD.x_opcion,
+            OLD.x_endpoint,
+            OLD.l_activo,
+            OLD.f_registro,
+            --control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusemo.trigger_control', 'off', true);
+        RETURN OLD;
 END;
 $function$;
 
@@ -487,112 +336,76 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_perfil()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemper.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemper.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_perfil(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_perfil,
-            x_perfil,
-            c_rol_seguridad,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_perfil'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_perfil,
-            OLD.x_perfil,
-            OLD.c_rol_seguridad,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_perfil(
-            n_trns_id,
-            --trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            --negocio
-            n_perfil,
-            x_perfil,
-            c_rol_seguridad,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            --control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_perfil'), 
-            --trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-            --negocio
-            OLD.n_perfil,
-            OLD.x_perfil,
-            OLD.c_rol_seguridad,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            --control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+
+        INSERT INTO serviciosexternos.aud_mae_perfil(
+            n_trns_id,
+            --trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            --negocio
+            n_perfil,
+            x_perfil,
+            c_rol_seguridad,
+            x_descripcion,
+            l_activo,
+            f_registro,
+            --control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_perfil'), 
+            --trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            session_user,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr,
+            --negocio
+            OLD.n_perfil,
+            OLD.x_perfil,
+            OLD.c_rol_seguridad,
+            OLD.x_descripcion,
+            OLD.l_activo,
+            OLD.f_registro,
+            --control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusemper.trigger_control', 'off', true);
+        RETURN OLD;
+    
 END;
 $function$;
 
@@ -600,8 +413,24 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_opcion_perfil()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemop.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemop.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
+    END IF;
+    
 		INSERT INTO serviciosexternos.aud_mae_opcion_perfil(
 			n_trns_id,
 			--trazabilidad
@@ -630,7 +459,7 @@ BEGIN
 			nextval('serviciosexternos.useq_aud_mae_opcion_perfil'), 
 			--trazabilidad
 			CURRENT_TIMESTAMP,
-			'D',
+			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
 			OLD.c_aud_ip,
@@ -650,59 +479,9 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		RETURN OLD;
-	ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_opcion_perfil(
-			n_trns_id,
-			--trazabilidad
-			f_trns,
-			b_trns,
-			c_trns_uid,
-			c_trns_pc,
-			n_trns_ip,
-			c_trns_mcaddr,
-			--negocio
-			n_opcion_perfil,
-			n_opcion,
-			n_perfil,
-			l_activo,
-			f_registro,
-			--control
-			f_aud,
-			b_aud,
-			c_aud_uid,
-			c_aud_uidred,
-			c_aud_pc,
-			c_aud_ip,
-			c_aud_mcaddr
-		) VALUES (
-			nextval('serviciosexternos.useq_aud_mae_opcion_perfil'), 
-			--trazabilidad
-			CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-			--negocio
-			OLD.n_opcion_perfil,
-			OLD.n_opcion,
-			OLD.n_perfil,
-			OLD.l_activo,
-			OLD.f_registro,
-			--control
-			OLD.f_aud,
-			OLD.b_aud,
-			OLD.c_aud_uid,
-			OLD.c_aud_uidred,
-			OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr
-		);
-		RETURN OLD;
-	ELSE
-        RETURN NULL;
-    END IF;
+		PERFORM set_config('gusemop.trigger_control', 'off', true);
+        RETURN OLD;
+
 END;
 $function$;
 
@@ -711,108 +490,74 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_entidad()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('guseme.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('guseme.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_entidad(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_entidad,
-            x_entidad,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_entidad'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_entidad,
-            OLD.x_entidad,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_entidad(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_entidad,
-            x_entidad,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_entidad'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_entidad,
-            OLD.x_entidad,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+   
+        INSERT INTO serviciosexternos.aud_mae_entidad(
+            n_trns_id,
+            -- trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            -- negocio
+            n_entidad,
+            x_entidad,
+            x_descripcion,
+            l_activo,
+            f_registro,
+            -- control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_entidad'),
+            -- trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            CURRENT_USER,
+            OLD.c_aud_pc,
+			OLD.c_aud_ip,
+			OLD.c_aud_mcaddr,
+            -- negocio
+            OLD.n_entidad,
+            OLD.x_entidad,
+            OLD.x_descripcion,
+            OLD.l_activo,
+            OLD.f_registro,
+            -- control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('guseme.trigger_control', 'off', true);
+        RETURN OLD;
+
 END;
 $function$;
 
@@ -820,8 +565,24 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_servicio()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusems.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusems.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
+    END IF;
+
 		INSERT INTO serviciosexternos.aud_mae_servicio(
 			n_trns_id,
 			--trazabilidad
@@ -855,7 +616,7 @@ BEGIN
 			nextval('serviciosexternos.useq_aud_mae_servicio'), 
 			--trazabilidad
 			CURRENT_TIMESTAMP,
-			'D',
+			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
 			OLD.c_aud_ip,
@@ -880,69 +641,9 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		RETURN OLD;
-	ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_servicio(
-			n_trns_id,
-			--trazabilidad
-			f_trns,
-			b_trns,
-			c_trns_uid,
-			c_trns_pc,
-			n_trns_ip,
-			c_trns_mcaddr,
-			--negocio
-			n_servicio,
-			n_entidad,
-			x_nombre_servicio,
-			x_descripcion,
-			x_url,
-			n_cuota,
-			l_actualizar_credencial,
-			n_dias_actualizar_credencial,
-			l_activo,
-			f_registro,
-			--control
-			f_aud,
-			b_aud,
-			c_aud_uid,
-			c_aud_uidred,
-			c_aud_pc,
-			c_aud_ip,
-			c_aud_mcaddr
-		)VALUES(
-			nextval('serviciosexternos.useq_aud_mae_servicio'), 
-			--trazabilidad
-			CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-			--negocio
-			OLD.n_servicio,
-			OLD.n_entidad,
-			OLD.x_nombre_servicio,
-			OLD.x_descripcion,
-			OLD.x_url,
-			OLD.n_cuota,
-			OLD.l_actualizar_credencial,
-			OLD.n_dias_actualizar_credencial,
-			OLD.l_activo,
-			OLD.f_registro,
-			--control
-			OLD.f_aud,
-			OLD.b_aud,
-			OLD.c_aud_uid,
-			OLD.c_aud_uidred,
-			OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr
-		);
-		RETURN OLD;
-	ELSE
-        RETURN NULL;
-    END IF;
+		PERFORM set_config('gusems.trigger_control', 'off', true);
+        RETURN OLD;
+	
 END;
 $function$;
 
@@ -950,8 +651,24 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_servicio_aplicativo()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemsp.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemsp.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
+    END IF;
+   
 		INSERT INTO serviciosexternos.aud_mae_servicio_aplicativo(
 			n_trns_id,
 			--trazabilidad
@@ -980,7 +697,7 @@ BEGIN
 			nextval('serviciosexternos.useq_aud_mae_servicio_aplicativo'), 
 			--trazabilidad
 			CURRENT_TIMESTAMP,
-			'D',
+			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
 			OLD.c_aud_ip,
@@ -1000,59 +717,9 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		RETURN OLD;
-	ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_servicio_aplicativo(
-			n_trns_id,
-			--trazabilidad
-			f_trns,
-			b_trns,
-			c_trns_uid,
-			c_trns_pc,
-			n_trns_ip,
-			c_trns_mcaddr,
-			--negocio
-			n_servicio_aplicativo,
-			n_servicio,
-			n_aplicativo,
-			l_activo,
-			f_registro,
-			--control
-			f_aud,
-			b_aud,
-			c_aud_uid,
-			c_aud_uidred,
-			c_aud_pc,
-			c_aud_ip,
-			c_aud_mcaddr
-		)VALUES(
-			nextval('serviciosexternos.useq_aud_mae_servicio_aplicativo'), 
-			--trazabilidad
-			CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-			--negocio
-			OLD.n_servicio_aplicativo,
-			OLD.n_servicio,
-			OLD.n_aplicativo,
-			OLD.l_activo,
-			OLD.f_registro,
-			--control
-			OLD.f_aud,
-			OLD.b_aud,
-			OLD.c_aud_uid,
-			OLD.c_aud_uidred,
-			OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr
-		);
-		RETURN OLD;
-	ELSE
-        RETURN NULL;
-    END IF;
+		PERFORM set_config('gusemsp.trigger_control', 'off', true);
+        RETURN OLD;
+	
 END;
 $function$;
 
@@ -1060,108 +727,74 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_aplicativo()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusema.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusema.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mae_aplicativo(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_aplicativo,
-            x_aplicativo,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_aplicativo'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_aplicativo,
-            OLD.x_aplicativo,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_aplicativo(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_aplicativo,
-            x_aplicativo,
-            x_descripcion,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mae_aplicativo'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_aplicativo,
-            OLD.x_aplicativo,
-            OLD.x_descripcion,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+    
+        INSERT INTO serviciosexternos.aud_mae_aplicativo(
+            n_trns_id,
+            -- trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            -- negocio
+            n_aplicativo,
+            x_aplicativo,
+            x_descripcion,
+            l_activo,
+            f_registro,
+            -- control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mae_aplicativo'),
+            -- trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            CURRENT_USER,
+            OLD.c_aud_pc,
+			OLD.c_aud_ip,
+			OLD.c_aud_mcaddr,
+            -- negocio
+            OLD.n_aplicativo,
+            OLD.x_aplicativo,
+            OLD.x_descripcion,
+            OLD.l_activo,
+            OLD.f_registro,
+            -- control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusema.trigger_control', 'off', true);
+        RETURN OLD;
+
 END;
 $function$;
 
@@ -1170,8 +803,24 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mae_cliente()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemc.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemc.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
+    ELSE
+        RETURN NULL;
+    END IF;
+    
 		INSERT INTO serviciosexternos.aud_mae_cliente(
 			n_trns_id,
 			--trazabilidad
@@ -1208,7 +857,7 @@ BEGIN
 			nextval('serviciosexternos.useq_aud_mae_cliente'), 
 			--trazabilidad
 			CURRENT_TIMESTAMP,
-			'D',
+			operation,
 			CURRENT_USER,
 			OLD.c_aud_pc,
 			OLD.c_aud_ip,
@@ -1236,75 +885,9 @@ BEGIN
 			OLD.c_aud_ip,
 			OLD.c_aud_mcaddr
 		);
-		RETURN OLD;
-	ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mae_cliente(
-			n_trns_id,
-			--trazabilidad
-			f_trns,
-			b_trns,
-			c_trns_uid,
-			c_trns_pc,
-			n_trns_ip,
-			c_trns_mcaddr,
-			--negocio
-			n_cliente,
-			n_persona,
-			n_aplicativo,
-			x_usuario,
-			x_clave,
-			n_cuota,
-			x_usuario_registra,
-			x_usurio_actualiza,
-			f_actualizacion,
-			f_actualizacion_fallida,
-			l_principal,
-			l_activo,
-			f_registro,
-			--control
-			f_aud,
-			b_aud,
-			c_aud_uid,
-			c_aud_uidred,
-			c_aud_pc,
-			c_aud_ip,
-			c_aud_mcaddr
-		)VALUES(
-			nextval('serviciosexternos.useq_aud_mae_cliente'), 
-			--trazabilidad
-			CURRENT_TIMESTAMP,
-            'U',
-            session_user,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr,
-			--negocio
-			OLD.n_cliente,
-			OLD.n_persona,
-			OLD.n_aplicativo,
-			OLD.x_usuario,
-			OLD.x_clave,
-			OLD.n_cuota,
-			OLD.x_usuario_registra,
-			OLD.x_usurio_actualiza,
-			OLD.f_actualizacion,
-			OLD.f_actualizacion_fallida,
-			OLD.l_principal,
-			OLD.l_activo,
-			OLD.f_registro,
-			--control
-			OLD.f_aud,
-			OLD.b_aud,
-			OLD.c_aud_uid,
-			OLD.c_aud_uidred,
-			OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr
-		);
-		RETURN OLD;
-	ELSE
-        RETURN NULL;
-    END IF;
+		PERFORM set_config('gusemc.trigger_control', 'off', true);
+        RETURN OLD;
+
 END;
 $function$;
 
@@ -1313,111 +896,75 @@ CREATE OR REPLACE FUNCTION serviciosexternos.ufn_mov_consumo_cuota()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $function$
+DECLARE 
+    operation CHAR(1);
 BEGIN
+    
+    IF current_setting('gusemcc.trigger_control', true) = 'on' THEN   
+        RETURN NULL;
+    END IF;
+    
+    PERFORM set_config('gusemcc.trigger_control', 'on', true);
+
     IF (TG_OP = 'DELETE') THEN
-        INSERT INTO serviciosexternos.aud_mov_consumo_cuota(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_consumo_cuota,
-            n_cliente,
-            f_consumo_cuota,
-            n_cuota_consumida,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mov_consumo_cuota'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'D',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_consumo_cuota,
-            OLD.n_cliente,
-            OLD.f_consumo_cuota,
-            OLD.n_cuota_consumida,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
-    ELSIF (TG_OP = 'UPDATE') THEN
-        INSERT INTO serviciosexternos.aud_mov_consumo_cuota(
-            n_trns_id,
-            -- trazabilidad
-            f_trns,
-            b_trns,
-            c_trns_uid,
-            c_trns_pc,
-            n_trns_ip,
-            c_trns_mcaddr,
-            -- negocio
-            n_consumo_cuota,
-            n_cliente,
-            f_consumo_cuota,
-            n_cuota_consumida,
-            l_activo,
-            f_registro,
-            -- control
-            f_aud,
-            b_aud,
-            c_aud_uid,
-            c_aud_uidred,
-            c_aud_pc,
-            c_aud_ip,
-            c_aud_mcaddr
-        ) VALUES (
-            nextval('serviciosexternos.useq_aud_mov_consumo_cuota'),
-            -- trazabilidad
-            CURRENT_TIMESTAMP,
-            'U',
-            CURRENT_USER,
-            OLD.c_aud_pc,
-			OLD.c_aud_ip,
-			OLD.c_aud_mcaddr,
-            -- negocio
-            OLD.n_consumo_cuota,
-            OLD.n_cliente,
-            OLD.f_consumo_cuota,
-            OLD.n_cuota_consumida,
-            OLD.l_activo,
-            OLD.f_registro,
-            -- control
-            OLD.f_aud,
-            OLD.b_aud,
-            OLD.c_aud_uid,
-            OLD.c_aud_uidred,
-            OLD.c_aud_pc,
-            OLD.c_aud_ip,
-            OLD.c_aud_mcaddr
-        );
-        RETURN OLD;
+        operation :='D';
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        operation :='U';
     ELSE
         RETURN NULL;
     END IF;
+   
+        INSERT INTO serviciosexternos.aud_mov_consumo_cuota(
+            n_trns_id,
+            -- trazabilidad
+            f_trns,
+            b_trns,
+            c_trns_uid,
+            c_trns_pc,
+            n_trns_ip,
+            c_trns_mcaddr,
+            -- negocio
+            n_consumo_cuota,
+            n_cliente,
+            f_consumo_cuota,
+            n_cuota_consumida,
+            l_activo,
+            f_registro,
+            -- control
+            f_aud,
+            b_aud,
+            c_aud_uid,
+            c_aud_uidred,
+            c_aud_pc,
+            c_aud_ip,
+            c_aud_mcaddr
+        ) VALUES (
+            nextval('serviciosexternos.useq_aud_mov_consumo_cuota'),
+            -- trazabilidad
+            CURRENT_TIMESTAMP,
+            operation,
+            CURRENT_USER,
+            OLD.c_aud_pc,
+			OLD.c_aud_ip,
+			OLD.c_aud_mcaddr,
+            -- negocio
+            OLD.n_consumo_cuota,
+            OLD.n_cliente,
+            OLD.f_consumo_cuota,
+            OLD.n_cuota_consumida,
+            OLD.l_activo,
+            OLD.f_registro,
+            -- control
+            OLD.f_aud,
+            OLD.b_aud,
+            OLD.c_aud_uid,
+            OLD.c_aud_uidred,
+            OLD.c_aud_pc,
+            OLD.c_aud_ip,
+            OLD.c_aud_mcaddr
+        );
+        PERFORM set_config('gusemcc.trigger_control', 'off', true);
+        RETURN OLD;
+
 END;
 $function$;

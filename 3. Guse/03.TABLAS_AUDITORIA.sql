@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS serviciosexternos.aud_mae_opcion (
     n_opcion int2 NOT NULL,
   x_opcion varchar(100) NOT NULL,
   x_endpoint varchar(100) NOT NULL,
+  x_icono VARCHAR (30),
   l_activo VARCHAR(1) DEFAULT '1' NOT NULL,
   f_registro TIMESTAMP NOT NULL,
     -- CONTROL
