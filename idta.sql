@@ -26,7 +26,7 @@ CREATE TRIGGER uid_seguridad.Utg_Cfg_SistemaConexion
     ON uid_seguridad.Cfg_SistemaConexion
     FOR UPDATE, DELETE AS
 BEGIN
-     DECLARE @XTYPE CHAR(1)
+    DECLARE @XTYPE CHAR(1)
 	DECLARE @n_aud_ip VARCHAR(15)
 
     IF EXISTS (SELECT 'X' FROM deleted)
@@ -38,9 +38,7 @@ BEGIN
         ELSE
             SELECT @XTYPE = 'I'
     END
-
-    			SET @n_aud_ip = (SELECT ipaddr from master..sysprocesses where spid = @@SPID)BEGI			
-	N
+    	SET @n_aud_ip = (SELECT ipaddr from master..sysprocesses where spid = @@SPID)
         INSERT INTO pjSeguridad.uid_seguridad.Aud_Cfg_SistemaConexion (
             f_trns, b_trns, c_trns_uid, c_trns_pc, n_trns_ip, c_trns_mcaddr,
             n_idConexion, n_idSistema, f_registro, x_observacion,
