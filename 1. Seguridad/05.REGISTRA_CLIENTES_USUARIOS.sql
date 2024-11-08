@@ -127,4 +127,55 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'Ya estaba asignado el usuario USR_00004 al cliente 00004';
 	END IF;
+
+	/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+	/*::::::::::::::::::::::JOB GESTION DE USUARIOS SERVICIOS EXTERNOS:::::::::::::::::::::::::*/
+	/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+	IF NOT EXISTS(SELECT 1 FROM seguridad.mae_cliente WHERE c_cliente='00005')
+	THEN 
+
+		INSERT INTO seguridad.mae_cliente( n_cliente, c_cliente, x_cliente, x_descripcion, l_tipo_cliente, l_activo,f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
+		VALUES ( nextval('seguridad.mae_cliente_seq'), 
+		 '00005', 
+		 'WS CONSULTA SERVICIOS COMUNES PIDE',
+		 'cliente para el WS consulta servicios PIDE',
+		 'I', 
+		 '1',
+		 var_f_aud,
+		 var_b_aud, 
+		 var_c_aud_uid,
+		 var_c_aud_uidred, 
+		 var_c_aud_pc,
+		 var_c_aud_ip,
+		 var_c_aud_mcaddr);
+		 
+		RAISE NOTICE 'Se creo el cliente con código 00005 ';
+	ELSE
+		RAISE NOTICE 'Ya estaba registrado el cliente con código 00005 ';
+	END IF;
+	
+	IF NOT EXISTS(SELECT 1 FROM seguridad.mae_usuario WHERE c_usuario='USR_00005' AND n_cliente = (select n_cliente from seguridad.mae_cliente where c_cliente='00005'))
+	THEN 
+
+		/*Cambiar el texto "PASSWORD" por la clave encriptada con  la opcion opcion <Encriptar con usuario y clave> y usuario USR_00005*/
+		INSERT INTO seguridad.mae_usuario
+		( n_usuario, c_usuario, c_clave,n_cliente, f_registro, l_activo,f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr) 
+		VALUES (nextval('seguridad.mae_usuario_seq'),
+		 'USR_00005',
+		 'PASSWORD',
+		 (select n_cliente from seguridad.mae_cliente where c_cliente='00005'),
+		 localtimestamp,
+		 '1',
+		var_f_aud,
+		 var_b_aud, 
+		 var_c_aud_uid,
+		 var_c_aud_uidred, 
+		 var_c_aud_pc,
+		 var_c_aud_ip,
+		 var_c_aud_mcaddr);
+		 
+		RAISE NOTICE 'Se asigno el usuario USR_00005 al cliente 00005';
+	ELSE
+		RAISE NOTICE 'Ya estaba asignado el usuario USR_00005 al cliente 00005';
+	END IF;
 END $$;

@@ -55,12 +55,26 @@ IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='GUSEWS01')
 			n_rol,c_rol,x_rol,x_descripcion,l_activo,
 			f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
 		VALUES(
-			nextval('seguridad.mae_rol_seq'),'GUSEWS01','Rol para el servicio RENIEC',
-			'Rol para obtener la lista de clientes con cuota en Reniec', '1',
+			nextval('seguridad.mae_rol_seq'),'GUSEWS01','Rol externo administrar cuota de los clientes',
+			'Rol para administrar cuota de los clientes', '1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
  		 RAISE NOTICE 'Se creo el rol GUSEWS01';
 	ELSE
 		RAISE NOTICE 'Ya estaba registrado el rol GUSEWS01';
+	END IF;
+
+	IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='GUSEJOB01')
+	THEN
+		INSERT INTO seguridad.mae_rol(
+			n_rol,c_rol,x_rol,x_descripcion,l_activo,
+			f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
+		VALUES(
+			nextval('seguridad.mae_rol_seq'),'GUSEJOB01','Rol externo Job',
+			'Rol para el componente Job', '1',
+			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
+ 		RAISE NOTICE 'Se creo el rol GUSEJOB01';
+	ELSE
+		RAISE NOTICE 'Ya estaba registrado el rol GUSEJOB01';
 	END IF;
 COMMIT;
 END $$;

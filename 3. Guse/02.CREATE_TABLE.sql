@@ -275,6 +275,7 @@ CREATE TABLE IF NOT EXISTS serviciosexternos.mae_cliente (
   CONSTRAINT fk_mae_cliente_01 FOREIGN KEY (n_persona) REFERENCES serviciosexternos.mae_persona (n_persona),
   CONSTRAINT fk_mae_cliente_02 FOREIGN KEY (n_aplicativo) REFERENCES serviciosexternos.mae_aplicativo (n_aplicativo),
   CONSTRAINT fk_mov_consumo_cuota_01 FOREIGN KEY (n_consumo_cuota) REFERENCES serviciosexternos.mov_consumo_cuota(n_consumo_cuota)
+  CONSTRAINT uk_mae_cliente UNIQUE (n_aplicativo, x_usuario)
     ) TABLESPACE "TBS_SERVICIOS_EXTERNOS";
 
 -- Mensajes de creación de tablas
