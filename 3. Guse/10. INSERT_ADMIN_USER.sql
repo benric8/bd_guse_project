@@ -24,6 +24,7 @@ declare
 	n_opcion_2 integer;
 	n_opcion_perfil integer;
 	n_perfil_admin integer;
+	n_perfil_adminclientes integer;
 	n_usuario_max integer;
 	n_persona_max integer;
 	n_perfil_max integer;
@@ -47,7 +48,7 @@ END IF;
 --Crear Perfil ADMINISTRADOR DE CLIENTES
 IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_perfil WHERE x_perfil='ADMINISTRADOR DE CLIENTES') THEN    
     INSERT INTO serviciosexternos.mae_perfil (n_perfil,x_perfil,c_rol_seguridad,x_descripcion,l_activo,f_registro,f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr) VALUES
-        (n_perfil_max,'ADMINISTRADOR DE CLIENTES','AGUSE02','perfil que gestiona los clientes','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
+        (n_perfil_max+1,'ADMINISTRADOR DE CLIENTES','AGUSE02','perfil que gestiona los clientes','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
     RAISE NOTICE 'Se creó el perfil ADMINISTRADOR DE CLIENTES';
 ELSE
 	RAISE NOTICE 'Ya estaba creado el perfil ADMINISTRADOR DE CLIENTES';
@@ -134,12 +135,10 @@ IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(
                                                                 AND n_opcion=(select n_opcion from serviciosexternos.mae_opcion where upper(trim(x_opcion)) = 'Proceso Clientes')) THEN
 	INSERT INTO serviciosexternos.mae_opcion_perfil (n_opcion_perfil,n_opcion,n_perfil,l_activo,
 							f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
-			VALUES (n_opcion_perfil,n_opcion_2,n_perfil_admin,'1',
+			VALUES (n_opcion_perfil,n_opcion_2,n_perfil_adminclientes,'1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
 	RAISE NOTICE 'Se asigno la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE CLIENTES';
 ELSE
 	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE CLIENTES';
 END IF;
 END$$;			
-
-
