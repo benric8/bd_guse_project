@@ -159,7 +159,8 @@ CREATE TABLE IF NOT EXISTS serviciosexternos.mae_entidad (
   c_aud_pc VARCHAR(30),
   c_aud_ip VARCHAR(40),
   c_aud_mcaddr VARCHAR(17),
-  CONSTRAINT pk_mae_entidad PRIMARY KEY (n_entidad)
+  CONSTRAINT pk_mae_entidad PRIMARY KEY (n_entidad),
+  CONSTRAINT uk_mae_entidad UNIQUE (x_documento)
 ) TABLESPACE "TBS_SERVICIOS_EXTERNOS";
 
 -- Tabla mae_servicio
@@ -224,9 +225,9 @@ CREATE TABLE IF NOT EXISTS serviciosexternos.mae_servicio_aplicativo (
   c_aud_mcaddr VARCHAR(17),
   CONSTRAINT pk_mae_servicio_aplicativo PRIMARY KEY (n_servicio_aplicativo),
   CONSTRAINT fk_mae_servicio_aplicativo_01 FOREIGN KEY (n_servicio) REFERENCES serviciosexternos.mae_servicio (n_servicio),
-  CONSTRAINT fk_mae_servicio_aplicativo_02 FOREIGN KEY (n_aplicativo) REFERENCES serviciosexternos.mae_aplicativo (n_aplicativo)
+  CONSTRAINT fk_mae_servicio_aplicativo_02 FOREIGN KEY (n_aplicativo) REFERENCES serviciosexternos.mae_aplicativo (n_aplicativo),
+  CONSTRAINT uk_mae_servicio_aplicativo UNIQUE (n_servicio, n_aplicativo)
 ) TABLESPACE "TBS_SERVICIOS_EXTERNOS";
-
 
 -- Tabla mov_consumo_cuota
 DROP TABLE IF EXISTS serviciosexternos.mov_consumo_cuota CASCADE;
@@ -274,7 +275,7 @@ CREATE TABLE IF NOT EXISTS serviciosexternos.mae_cliente (
   CONSTRAINT pk_mae_cliente PRIMARY KEY (n_cliente),
   CONSTRAINT fk_mae_cliente_01 FOREIGN KEY (n_persona) REFERENCES serviciosexternos.mae_persona (n_persona),
   CONSTRAINT fk_mae_cliente_02 FOREIGN KEY (n_aplicativo) REFERENCES serviciosexternos.mae_aplicativo (n_aplicativo),
-  CONSTRAINT fk_mov_consumo_cuota_01 FOREIGN KEY (n_consumo_cuota) REFERENCES serviciosexternos.mov_consumo_cuota(n_consumo_cuota)
+  CONSTRAINT fk_mov_consumo_cuota_01 FOREIGN KEY (n_consumo_cuota) REFERENCES serviciosexternos.mov_consumo_cuota(n_consumo_cuota),
   CONSTRAINT uk_mae_cliente UNIQUE (n_aplicativo, x_usuario)
     ) TABLESPACE "TBS_SERVICIOS_EXTERNOS";
 

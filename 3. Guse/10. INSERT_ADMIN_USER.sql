@@ -36,26 +36,26 @@ n_usuario_max := (select nextval('"serviciosexternos"."useq_mae_usuario"'));
 n_persona_max := (select nextval('"serviciosexternos"."useq_mae_persona"'));
 n_perfil_max := (select nextval('"serviciosexternos"."useq_mae_perfil"'));
 
---Crear Perfil ADMINISTRADOR
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_perfil WHERE x_perfil='ADMINISTRADOR') THEN    
+--Crear Perfil ADMINISTRADOR DE SISTEMA
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_perfil WHERE x_perfil='ADMINISTRADOR DE SISTEMA') THEN    
     INSERT INTO serviciosexternos.mae_perfil (n_perfil,x_perfil,c_rol_seguridad,x_descripcion,l_activo,f_registro,f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr) VALUES
-        (n_perfil_max,'ADMINISTRADOR','AGUSE01','perfil que tiene completo acceso','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
-    RAISE NOTICE 'Se creó el perfil ADMINISTRADOR';
+        (n_perfil_max,'ADMINISTRADOR DE SISTEMA','AGUSE01','perfil que tiene completo acceso','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
+    RAISE NOTICE 'Se creó el perfil ADMINISTRADOR DE SISTEMA';
 ELSE
-	RAISE NOTICE 'Ya estaba creado el perfil ADMINISTRADOR';
+	RAISE NOTICE 'Ya estaba creado el perfil ADMINISTRADOR DE SISTEMA';
 END IF;
 
---Crear Perfil ADMINISTRADOR DE CLIENTES
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_perfil WHERE x_perfil='ADMINISTRADOR DE CLIENTES') THEN    
+--Crear Perfil ADMINISTRADOR DE ACCESOS
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_perfil WHERE x_perfil='ADMINISTRADOR DE ACCESOS') THEN    
     INSERT INTO serviciosexternos.mae_perfil (n_perfil,x_perfil,c_rol_seguridad,x_descripcion,l_activo,f_registro,f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr) VALUES
-        (n_perfil_max+1,'ADMINISTRADOR DE CLIENTES','AGUSE02','perfil que gestiona los clientes','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
-    RAISE NOTICE 'Se creó el perfil ADMINISTRADOR DE CLIENTES';
+        (n_perfil_max+1,'ADMINISTRADOR DE ACCESOS','AGUSE02','perfil que gestiona los accesos','1', var_f_aud, var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
+    RAISE NOTICE 'Se creó el perfil ADMINISTRADOR DE ACCESOS';
 ELSE
-	RAISE NOTICE 'Ya estaba creado el perfil ADMINISTRADOR DE CLIENTES';
+	RAISE NOTICE 'Ya estaba creado el perfil ADMINISTRADOR DE ACCESOS';
 END IF;
 
-n_perfil_admin := (select n_perfil from serviciosexternos.mae_perfil where x_perfil = 'ADMINISTRADOR');
-n_perfil_adminclientes := (select n_perfil from serviciosexternos.mae_perfil where x_perfil = 'ADMINISTRADOR DE CLIENTES');
+n_perfil_admin := (select n_perfil from serviciosexternos.mae_perfil where x_perfil = 'ADMINISTRADOR DE SISTEMA');
+n_perfil_adminclientes := (select n_perfil from serviciosexternos.mae_perfil where x_perfil = 'ADMINISTRADOR DE ACCESOS');
 
 
 --Crear Persona
@@ -83,20 +83,20 @@ ELSE
 END IF;
 
 -- Crear opciones
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion WHERE x_opcion='Procesos Servicios') THEN 
-	INSERT INTO serviciosexternos.mae_opcion (n_opcion,x_opcion,x_endpoint,l_activo,
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion WHERE x_opcion='servicios') THEN 
+	INSERT INTO serviciosexternos.mae_opcion (n_opcion,x_opcion,x_endpoint,x_icono,l_activo,
 										f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
-	VALUES (n_opcion_1,'Procesos Servicios','procesos/servicios','1',
+	VALUES (n_opcion_1,'servicios','/procesos/servicios','pi pi-book','1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
 	RAISE NOTICE 'Se creo la opcion Mantenimiento Servicios';
 ELSE
 	RAISE NOTICE 'Ya estaba creada la opcion Mantenimiento Servicios';
 END IF;
 n_opcion_2 := (select nextval('"serviciosexternos"."useq_mae_opcion"'));
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion WHERE x_opcion='Procesos Clientes') THEN 	
-	INSERT INTO serviciosexternos.mae_opcion (n_opcion,x_opcion,x_endpoint,l_activo,
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion WHERE x_opcion='clientes') THEN 	
+	INSERT INTO serviciosexternos.mae_opcion (n_opcion,x_opcion,x_endpoint,x_icono,l_activo,
 										f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
-	VALUES (n_opcion_2,'Procesos Clientes','procesos/clientes','1',
+	VALUES (n_opcion_2,'clientes','/procesos/clientes','pi pi-clone','1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
 	RAISE NOTICE 'Se creo la opcion Mantenimiento Clientes';
 ELSE
@@ -104,41 +104,41 @@ ELSE
 END IF;
 n_opcion_perfil := (select nextval('"serviciosexternos"."useq_mae_opcion_perfil"'));
 
--- Relacionar opciones con el perfil administrador
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR')
+-- Relacionar opciones con el perfil ADMINISTRADOR DE SISTEMA
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR DE SISTEMA')
                                                                 AND n_opcion=(select n_opcion from serviciosexternos.mae_opcion where upper(trim(x_opcion)) = 'Proceso Servicios')) THEN
 	INSERT INTO serviciosexternos.mae_opcion_perfil (n_opcion_perfil,n_opcion,n_perfil,l_activo,
 							f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
 			VALUES (n_opcion_perfil,n_opcion_1,n_perfil_admin,'1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
-	RAISE NOTICE 'Se asigno la opcion Mantenimiento Servicios al perfil ADMINISTRADOR';
+	RAISE NOTICE 'Se asigno la opcion Mantenimiento Servicios al perfil ADMINISTRADOR DE SISTEMA';
 ELSE
-	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Servicios al perfil ADMINISTRADOR';
+	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Servicios al perfil ADMINISTRADOR DE SISTEMA';
 END IF;
 
 n_opcion_perfil := (select nextval('"serviciosexternos"."useq_mae_opcion_perfil"'));
 
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR')
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR DE SISTEMA')
                                                                 AND n_opcion=(select n_opcion from serviciosexternos.mae_opcion where upper(trim(x_opcion)) = 'Proceso Clientes')) THEN
 	INSERT INTO serviciosexternos.mae_opcion_perfil (n_opcion_perfil,n_opcion,n_perfil,l_activo,
 							f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
 			VALUES (n_opcion_perfil,n_opcion_2,n_perfil_admin,'1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
-	RAISE NOTICE 'Se asigno la opcion Mantenimiento Clientes al perfil ADMINISTRADOR';
+	RAISE NOTICE 'Se asigno la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE SISTEMA';
 ELSE
-	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Clientes al perfil ADMINISTRADOR';
+	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE SISTEMA';
 END IF;
 
 n_opcion_perfil := (select nextval('"serviciosexternos"."useq_mae_opcion_perfil"'));
-
-IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR DE CLIENTES')
+-- Relacionar opciones con el perfil administrador de accesos
+IF NOT EXISTS(SELECT 1 FROM serviciosexternos.mae_opcion_perfil WHERE n_perfil=(select n_perfil from serviciosexternos.mae_perfil mp where upper(trim(x_perfil))='ADMINISTRADOR DE ACCESOS')
                                                                 AND n_opcion=(select n_opcion from serviciosexternos.mae_opcion where upper(trim(x_opcion)) = 'Proceso Clientes')) THEN
 	INSERT INTO serviciosexternos.mae_opcion_perfil (n_opcion_perfil,n_opcion,n_perfil,l_activo,
 							f_aud,b_aud,c_aud_uid,c_aud_uidred,c_aud_pc,c_aud_ip,c_aud_mcaddr)
 			VALUES (n_opcion_perfil,n_opcion_2,n_perfil_adminclientes,'1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
-	RAISE NOTICE 'Se asigno la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE CLIENTES';
+	RAISE NOTICE 'Se asigno la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE ACCESOS';
 ELSE
-	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE CLIENTES';
+	RAISE NOTICE 'Ya estaba asignado la opcion Mantenimiento Clientes al perfil ADMINISTRADOR DE ACCESOS';
 END IF;
 END$$;			

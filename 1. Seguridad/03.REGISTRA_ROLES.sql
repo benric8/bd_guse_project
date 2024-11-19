@@ -29,8 +29,8 @@ IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='AGUSE01')
 			n_rol,c_rol,x_rol,x_descripcion,l_activo,
 			f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
 		VALUES(
-			nextval('seguridad.mae_rol_seq'),'AGUSE01','Administrador usuarios-servicios-externos-api-rest',
-			'Rol que se otorga al usuario administrador que consumira el api', '1',
+			nextval('seguridad.mae_rol_seq'),'AGUSE01','Administrador de sistema usuarios-servicios-externos-api-rest',
+			'Rol que se otorga al perifl administrador de sistema', '1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
  		 RAISE NOTICE 'Se creo el rol AGUSE01';
 	ELSE
@@ -42,8 +42,8 @@ IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol WHERE c_rol='AGUSE02')
 			n_rol,c_rol,x_rol,x_descripcion,l_activo,
 			f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
 		VALUES(
-			nextval('seguridad.mae_rol_seq'),'AGUSE02','Administrador de clientes GUSE',
-			'Rol que permite gestionar los metodos de gestion de clientes', '1',
+			nextval('seguridad.mae_rol_seq'),'AGUSE02','Administrador de accesos GUSE',
+			'Rol que se le otorga al perfil administrador de accesos', '1',
 			var_f_aud, var_b_aud, var_c_aud_uid, var_c_aud_uidred,var_c_aud_pc,var_c_aud_ip,var_c_aud_mcaddr);
  		 RAISE NOTICE 'Se creo el rol AGUSE02';
 	ELSE

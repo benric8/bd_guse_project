@@ -137,8 +137,8 @@ BEGIN
 		INSERT INTO seguridad.mae_cliente( n_cliente, c_cliente, x_cliente, x_descripcion, l_tipo_cliente, l_activo,f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr)
 		VALUES ( nextval('seguridad.mae_cliente_seq'), 
 		 '00005', 
-		 'WS CONSULTA SERVICIOS COMUNES PIDE',
-		 'cliente para el WS consulta servicios PIDE',
+		 'JOB GESTION DE USUARIOS SERVICIOS EXTERNOS',
+		 'cliente para el Job GUSE',
 		 'I', 
 		 '1',
 		 var_f_aud,

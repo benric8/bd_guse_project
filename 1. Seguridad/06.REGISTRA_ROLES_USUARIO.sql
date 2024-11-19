@@ -45,6 +45,29 @@ BEGIN
 		RAISE NOTICE 'Ya estaba asignado el rol AGUSE01 al usuario USR_00003';
 	END IF;
 
+	IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol_usuario WHERE n_rol=(select n_rol from seguridad.mae_rol where c_rol = 'AGUSE02')
+							AND n_usuario=(select n_usuario from seguridad.mae_usuario where c_usuario = 'USR_00003'))
+	THEN 
+
+		INSERT INTO seguridad.mae_rol_usuario
+		( n_rol_usuario, n_rol, n_usuario, l_activo,f_aud, b_aud, c_aud_uid, c_aud_uidred, c_aud_pc, c_aud_ip, c_aud_mcaddr) 
+		VALUES (nextval('seguridad.mae_rol_usuario_seq'), 
+		(select n_rol from seguridad.mae_rol where c_rol = 'AGUSE02'),
+		(select n_usuario from seguridad.mae_usuario where c_usuario = 'USR_00003'),
+		'1', 
+		 var_f_aud,
+		 var_b_aud, 
+		 var_c_aud_uid,
+		 var_c_aud_uidred, 
+		 var_c_aud_pc,
+		 var_c_aud_ip,
+		 var_c_aud_mcaddr);
+		 
+		RAISE NOTICE 'Se asigno el rol AGUSE02 al usuario USR_00003';
+	ELSE
+		RAISE NOTICE 'Ya estaba asignado el rol AGUSE02 al usuario USR_00003';
+	END IF;
+
 	/*Registrar Roles de usuario USR_00004*/
 	IF NOT EXISTS(SELECT 1 FROM seguridad.mae_rol_usuario WHERE n_rol=(select n_rol from seguridad.mae_rol where c_rol = 'GUSEWS01')
 							AND n_usuario=(select n_usuario from seguridad.mae_usuario where c_usuario = 'USR_00004'))
